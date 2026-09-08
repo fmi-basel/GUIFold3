@@ -1,0 +1,16 @@
+include guifold3/ui/*.ui
+include guifold3/icons/*.png
+include guifold3/config/guifold.conf
+include guifold3/templates/*.j2
+include guifold3/templates/*.html
+include guifold3/templates/*.js
+include guifold3/templates/*.css
+include guifold3/templates/*.pml
+include guifold3/templates_af3/*.j2
+include guifold3/templates_af3/*.html
+include guifold3/templates_af3/*.js
+include guifold3/templates_af3/*.css
+include guifold3/templates_af3/*.pml
+include guifold3/ui/*.qss
+include guifold3/images/*.png
+include alphafold/common/stereo_chemical_props.txt

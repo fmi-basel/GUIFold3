@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html>
+
+   <head>
+       <meta charset = "utf-8">
+       <title>Result summary of pairwise predictions</title>
+
+       <style>{% include 'style.css' %}</style>
+
+       <script>
+        function resizeIframe(obj) {
+          obj.style.height = obj.contentWindow.document.documentElement.scrollHeight + 'px';
+        }
+      </script>
+      
+   </head>
+ 
+   <body>
+
+        <div class="page">
+            <div class="sidenav">
+                {% if not multimer_score_list_grouped is none %}<a href="#multimer_score_merged">Multimer score (merged)</a><br />{% endif %}
+                {% if not pae_list_grouped is none %}<a href="#pae_merged">Inter-subunit PAE (merged)</a><br />{% endif %}
+                {% if not iptm_list_grouped is none %}<a href="#iptm_merged">ipTM (merged)</a><br />{% endif %}
+                {% if not ptm_list_grouped is none %}<a href="#ptm_merged">pTM (merged)</a><br />{% endif %}
+                <a href="#multimer_score">Multimer score</a><br />
+                <a href="#pae">Inter-subunit PAE</a><br />
+                <a href="#iptm">ipTM</a><br />
+                <a href="#ptm">pTM</a><br />
+            </div>
+            <div class="main">
+            
+
+
+            {% if not multimer_score_list_grouped is none %}
+            <span id="multimer_score_merged">
+                <h2>Max multimer score (split proteins merged)</h2>
+
+                <p>Maximum multimer score selected from 1-5 models</p>
+
+            {{ plotly['max_multimer_score_barplot']}}
+            {% if pairwise is true %}
+            {{ plotly['max_multimer_score_heatmap']}}
+            {% endif %}
+
+            <table border = "1">
+                {% for name, score in multimer_score_list_grouped %}
+                {% if loop.index == 1 %}
+                <tr>
+                    <th>Combination</th>
+                    <th>Multimer score</th>
+                </tr>
+                {% endif %}
+
+                <tr id="multimer-scosplit proteins merged-table-{{loop.index}}">
+                    <td>{{name}}</td>
+                    <td>{{'%0.2f'| format(score|float)}}</td>
+                </tr>
+                {% endfor %}
+            </table>
+            </span>
+            {% endif %}
+
+
+            {% if not pae_list_grouped is none %}
+            <span id="pae_merged">
+                <h2>Min inter-PAE (split proteins merged)</h2>
+
+                <p>Minimum inter-subunit PAE selected from 1-5 models (lower values are better)</p>
+
+            {{ plotly['min_pae_barplot'] }}
+            {% if pairwise is true %}
+            {{ plotly['min_pae_heatmap'] }}
+            {% endif %}
+
+            <table border = "1">
+                {% for name, score in pae_list_grouped %}
+                {% if loop.index == 1 %}
+                <tr>
+                    <th>Combination</th>
+                    <th>Multimer score</th>
+                </tr>
+                {% endif %}
+
+                <tr id="pae-grouped-table-{{loop.index}}">
+                    <td>{{name}}</td>
+                    <td>{{'%0.2f'| format(score|float)}}</td>
+                </tr>
+                {% endfor %}
+            </table>
+            </span>
+            {% endif %}
+
+            
+            {% if not iptm_list_grouped is none %}
+            <span id="iptm_merged">
+                <h2>Max ipTM score (split proteins merged)</h2>
+
+            {{ plotly['max_iptm_barplot'] }}
+            {% if pairwise is true %}
+            {{ plotly['max_iptm_heatmap'] }}
+            {% endif %}
+                
+            <table border = "1">
+                {% for name, score in iptm_list_grouped %}
+                {% if loop.index == 1 %}
+                <tr>
+                    <th>Combination</th>
+                    <th>Multimer score</th>
+                </tr>
+                {% endif %}
+
+                <tr id="iptm-scosplit proteins merged-table-{{loop.index}}">
+                    <td>{{name}}</td>
+                    <td>{{'%0.2f'| format(score|float)}}</td>
+                </tr>
+                {% endfor %}
+            </table>
+            </span>
+            {% endif %}
+
+            
+
+            {% if not ptm_list_grouped is none %}
+            <span id="ptm_merged">
+            <h2>Max pTM score (split proteins merged)</h2>
+
+            {{ plotly['max_ptm_barplot'] }}
+            {% if pairwise is true %}
+            {{ plotly['max_ptm_heatmap'] }}
+            {% endif %}
+
+            <table border = "1">
+                {% for name, score in ptm_list_grouped %}
+                {% if loop.index == 1 %}
+                <tr>
+                    <th>Combination</th>
+                    <th>pTM score</th>
+                    <th>Model number</th>
+                </tr>
+                {% endif %}
+
+                <tr id="ptm-scosplit proteins merged-table-{{loop.index}}">
+                    <td>{{name}}</td>
+                    <td>{{'%0.2f'| format(score|float)}}</td>
+                    <td>{{model}}</td>
+                </tr>
+                {% endfor %}
+            </table>
+            </span>
+            {% endif %}
+            
+            <span id="multimer_score">
+            <h2>Max multimer score</h2>
+
+            
+            {{ plotly['max_multimer_score_barplot'] }}
+            {{ plotly['max_multimer_score_heatmap'] }}
+
+            <table border = "1">
+                {% for name, (score, model) in protein_multimer_score_mapping.items() %}
+                {% if loop.index == 1 %}
+                <tr>
+                    <th>Combination</th>
+                    <th>Multimer score</th>
+                    <th>Model number</th>
+                </tr>
+                {% endif %}
+
+                <tr id="multimer-score-table-{{loop.index}}">
+                    <td><a href="{{name}}/results_model_viewer.html">{{name}}</a></td>
+                    <td>{{'%0.2f'| format(score|float)}}</td>
+                    <td>{{model}}</td>
+                </tr>
+                {% endfor %}
+            </table>
+            </span>
+
+            <span id="pae">
+            <h2>Min inter-PAE</h2>
+
+            {{ plotly['min_pae_barplot'] }}
+            {% if pairwise is true %}
+            {{ plotly['min_pae_heatmap'] }}
+            {% endif %}
+
+            <table border = "1">
+                {% for name, (score, model) in protein_pae_mapping.items() %}
+                {% if loop.index == 1 %}
+                <tr>
+                    <th>Combination</th>
+                    <th>Inter-subunit PAE</th>
+                    <th>Model number</th>
+                </tr>
+                {% endif %}
+
+                <tr id="pae-table-{{loop.index}}">
+                    <td><a href="{{name}}/results_model_viewer.html">{{name}}</a></td>
+                    <td>{{'%0.2f'| format(score|float)}}</td>
+                    <td>{{model}}</td>
+                </tr>
+                {% endfor %}
+            </table>
+            </span>
+
+            <span id="ptm"></span>
+            <h2>Max pTM</h2>
+
+            {{ plotly['max_ptm_barplot'] }}
+            {% if pairwise is true %}
+            {{ plotly['max_ptm_heatmap'] }}
+            {% endif %}
+
+            <table border = "1">
+                {% for name, (score, model) in protein_ptm_mapping.items() %}
+                {% if loop.index == 1 %}
+                <tr>
+                    <th>Combination</th>
+                    <th>pTM</th>
+                    <th>Model number</th>
+                </tr>
+                {% endif %}
+
+                <tr id="ptm-table-{{loop.index}}">
+                    <td>{{name}}</td>
+                    <td>{{'%0.2f'| format(score|float)}}</td>
+                    <td>{{model}}</td>
+                </tr>
+                {% endfor %}
+            </table>
+            </span>
+
+            <span id="iptm">
+            <h2>Max ipTM</h2>
+
+            {{ plotly['max_iptm_barplot'] }}
+            {% if pairwise is true %}
+            {{ plotly['max_iptm_heatmap'] }}
+            {% endif %}
+
+            <table border = "1">
+                {% for name, (score, model) in protein_iptm_mapping.items() %}
+                {% if loop.index == 1 %}
+                <tr>
+                    <th>Combination</th>
+                    <th>ipTM</th>
+                    <th>Model number</th>
+                </tr>
+                {% endif %}
+
+                <tr id="iptm-table-{{loop.index}}">
+                    <td><a href="{{name}}/results_model_viewer.html">{{name}}</a></td>
+                    <td>{{'%0.2f'| format(score|float)}}</td>
+                    <td>{{model}}</td>
+                </tr>
+                {% endfor %}
+            </table>
+            </span>
+
+          </div>
+        </div>
+    </body>
+</html>

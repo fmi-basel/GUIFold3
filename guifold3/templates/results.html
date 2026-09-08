@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+
+   <head>
+       <meta charset = "utf-8">
+       <title>Alphafold results</title>
+       <!--<link href = "https://code.jquery.com/ui/1.10.4/themes/ui-lightness/jquery-ui.css" rel = "stylesheet">-->
+       <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+       <script src="https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+       {% if use_model_viewer %}
+       <script src="https://3Dmol.org/build/3Dmol-min.js"></script>     
+       <script src="https://3Dmol.org/build/3Dmol.ui-min.js"></script>
+       {% endif %}
+       <script>{% include 'scripts.js' %}</script>
+
+       <style>{% include 'style.css' %}</style>
+
+
+   </head>
+
+   <body>
+
+
+   <div class="page">
+       <div class="sidenav">
+       {% include 'navigation.html' %}
+       </div>
+        <div class="main">
+            <div style="">
+                <h1 style="margin: 0;">Results</h1>
+            </div>
+            <div>
+                {% if not multimer %}
+                    {% include 'plddt.html' %}
+                <br />
+                {% endif %}
+                {% if not pae_results is none %}
+                {% include 'pae.html' %}
+                {% endif %}
+                <br />
+                {% if not multimer_score_list is none %}
+                {% include 'multimer_score.html' %}
+                {% endif %}
+                <br />
+                {% include 'ptm.html' %}
+                <br />
+                {% include 'iptm.html' %}
+                <br />
+                <!--Lack of WebGL support on some platforms causes too many complications. Locally installed model viewers should be used in the meantime-->
+                {% if use_model_viewer %}
+                <span id="model_viewer">{% include 'model_viewer.html' %}</span>
+                <br />
+                {% endif %}
+                    {% if multimer %}
+                        {% include 'plddt.html' %}
+                    {% endif %}
+                <br />
+                </div>
+            </div>
+            </br></br></br></br>
+       </div>
+   </script>
+   </body>
+
+</html>

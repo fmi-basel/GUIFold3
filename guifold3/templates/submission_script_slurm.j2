@@ -1,0 +1,64 @@
+#!/bin/bash
+#SBATCH --account={{account}}
+#SBATCH --job-name=alphafold
+#SBATCH --cpus-per-task={{num_cpu}}
+#SBATCH --ntasks=1
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=1
+#SBATCH --output={{logfile}}
+#SBATCH --error={{logfile}}
+#Append to logfile
+#SBATCH --open-mode=append
+#SBATCH --mem={{mem}}G
+
+{% if split_job %}
+#If job is split into CPU and GPU part set dependency
+#SBATCH --dependency=afterok:{{queue_job_id}}
+#SBATCH --kill-on-invalid-dep=yes
+{% endif %}
+
+
+# Settings when GPU required
+{% if use_gpu %}
+#SBATCH --gres=gpu:{num_gpus}
+# Select appropriate GPU model based on estimated memory
+   {% if gpu_mem | int <= 31 %}
+#SBATCH --constraint=
+#SBATCH --partition=
+   {% elif gpu_mem | int > 31 and gpu_mem | int <= 45 %}
+#SBATCH --constraint=
+#SBATCH --partition=
+   {% elif gpu_mem | int > 45 %}
+#SBATCH --constraint=
+#SBATCH --partition=
+   {% endif %}
+
+# Settings when job only needs CPU, i.e. use_gpu is False
+{% else %}
+    {% if total_sequence_length|int > 2000 %}
+#SBATCH --partition=
+    {% else %}
+#SBATCH --partition=
+    {% endif %}
+{% endif %}
+
+START=$(date +%s)
+STARTDATE=$(date -Iseconds)
+echo "[INFO] [$STARTDATE] [$$] Starting SLURM job $SLURM_JOB_ID"
+echo "[INFO] [$STARTDATE] [$$] QUEUE_JOB_ID=$SLURM_JOB_ID"
+echo "[INFO] [$STARTDATE] [$$] Running on $(hostname -s)"
+echo "[INFO] [$STARTDATE] [$$] Working directory: $(pwd)"
+echo "[INFO} [$STARTDATE] [$$] Total sequence length is {{total_sequence_length}}"
+
+
+module purge
+module load alphafold3
+{{ command }}
+EXITCODE=$?
+END=$(date +%s)
+ENDDATE=$(date -Iseconds)
+echo "[INFO] [$ENDDATE] [$$] Workflow finished with code $EXITCODE"
+echo "[INFO] [$ENDDATE] [$$] Workflow execution time \(seconds\) : $(( $END-$START ))"
+echo -n "[INFO] [$ENDDATE] [$$] Max memory usage in bytes: "
+cat /sys/fs/cgroup/memory/slurm/uid_$(id -u)/job_${SLURM_JOB_ID}/memory.max_usage_in_bytes
+echo
