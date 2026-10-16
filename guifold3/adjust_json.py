@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import json
 import sys
 import os
@@ -19,9 +20,10 @@ def main():
         new_id = old_id + 1
         name_list[-1] = str(new_id)
         data['name'] = '_'.join(name_list)
+        data['modelSeeds'] = [1]
 
         dir_name = os.path.dirname(new_json_path)
-        if not os.path.exists(dir_name):
+        if dir_name and not os.path.exists(dir_name):
             os.makedirs(dir_name)
         with open(new_json_path, 'w') as fh:
             json.dump(data, fh)

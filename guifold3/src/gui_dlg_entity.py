@@ -15,7 +15,6 @@
 # Author: Georg Kempf, Friedrich Miescher Institute for Biomedical Research
 
 from html.entities import entitydefs
-from selectors import EpollSelector
 import string
 import pkg_resources
 from PyQt5 import QtWidgets, uic
@@ -144,7 +143,9 @@ class EntityDlg(QtWidgets.QDialog):
     def OnBtnModificationAdd(self):
         mod_type = self.entity.modification_type.ctrl.text()
         if len(mod_type) != 3:
-            self.error_dlg('Error', "Modification type must be a 3-letter CCD code")
+            self.dlg = self.error_dlg('Error', "Modification type must be a 3-letter CCD code")
+            self.dlg.show()
+            return
         mod_pos = self.entity.modification_position.ctrl.value()
         self.entity.modifications.ctrl.addItem(f"{mod_type}_{mod_pos}")
 

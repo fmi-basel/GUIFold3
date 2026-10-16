@@ -156,7 +156,7 @@ class LoadJob(QObject):
                 self._parent.gui_params['job_status_log_file'] = self._parent.job.get_job_status_log_file(self._parent.gui_params['log_file'])
                 logger.debug(f"Log file is {self._parent.gui_params['log_file']}")
                 self._parent.gui_params['results_path'] = os.path.join(self._parent.gui_params['job_path'], self._parent.gui_params['job_dir'])
-                self._parent.gui_params['self._parent_settings_changed'] = True
+                self._parent.gui_params['other_settings_changed'] = True
 
                 self._parent.gui_params['entity_list'] = self._parent.jobparams.get_entity_list()
                 print(self._parent.gui_params['entity_list'])
@@ -282,8 +282,6 @@ class MonitorJob(QObject):
             if self.pointer is None:
                 self.job_params['log_file_lines'] = lines
                 log.seek(0, 2)
-            else:
-                self.job_params['log_file_lines'].extend(lines)
             self.pointer = log.tell()
         if self.job_params['queue']:
             self._parent.job.get_queue_pid(self.log_file, self.job_params['job_id'], self.sess)
@@ -543,8 +541,8 @@ class RunProcessThread(QObject):
                         #Only add this error message if no other upstream error was found.
                         if not error_found:
                             msg = f"Could not match queue_job_id pattern to queue submit output. The output was {output} and the pattern is {regex}. Check the pattern defined in Settings."
-                        logger.error(msg)
-                        error_msgs.append(msg)
+                            logger.error(msg)
+                            error_msgs.append(msg)
                         queue_job_id = None
                         self.job_params['status'] = "error"
                     self.job_params['pid'] = queue_job_id
@@ -583,6 +581,9 @@ class RunProcessThread(QObject):
             self.error.emit(error_msgs)
 
 class LogFileReadThread(QThread):
+    update_progress = pyqtSignal(int)
+    line_read = pyqtSignal(str)
+
     def __init__(self, file_path):
         super().__init__()
         self.file_path = file_path

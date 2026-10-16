@@ -318,14 +318,12 @@ class Variable:
                     self.value = result_val
                     logger.debug("Variable name: {}\nValue: {}".format(result_var, result_val))
                     if not self.ctrl is None:
-                        if not result_val in ['tbl', 'tre']:
+                        if not self.ctrl_type in ['tbl', 'tre']:
                             if result_val in [None, "None", "none"]:
                                 if self.ctrl_type == 'chk':
                                     result_val = False
                                 else:
                                     result_val = ""
-                                if self.ctrl_type == 'cml':
-                                    result_val = result_val.split(',')
                             self.set_control(result_val, result_var)
         else:
             logger.warning("DB result empty. Nothing to update.")
@@ -763,7 +761,7 @@ class Evaluation(GUIVariables):
                 logger.debug(results_path)
                 self.results.ctrl.settings().setAttribute(QtWebEngineWidgets.QWebEngineSettings.WebGLEnabled, False)
                 logger.debug(f"WebGL enabled: {self.results.ctrl.settings().testAttribute(QtWebEngineWidgets.QWebEngineSettings.WebGLEnabled)}")
-                logger.debug(f"QMLSCENE_DEVICE: {os.environ['QMLSCENE_DEVICE']}")
+                logger.debug(f"QMLSCENE_DEVICE: {os.environ.get('QMLSCENE_DEVICE', 'not set')}")
 
                 self.results.ctrl.loadStarted.connect(self.print_load_started)
                 self.results.ctrl.loadProgress.connect(self.print_load_percent)
@@ -935,6 +933,7 @@ class JobParams(GUIVariables):
                     rna_entity_dict["paired_msa"] = ""
                 if entity.custom_unpaired_msa_path.get_value():
                     rna_entity_dict["unpairedMsaPath"] = entity.custom_unpaired_msa_path.get_value()
+                if entity.custom_paired_msa_path.get_value():
                     rna_entity_dict["pairedMsaPath"] = entity.custom_paired_msa_path.get_value()
                 if entity.modifications.get_value():
                     rna_entity_dict["modifications"] = []

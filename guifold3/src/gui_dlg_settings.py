@@ -110,8 +110,8 @@ class SettingsDlg(QtWidgets.QDialog):
         if dlg.exec_():
             path = dlg.selectedFiles()[0]
             logger.debug(path)
-        self.settings.submission_script_template_path.set_value(path)
-        self.settings.submission_script_template_path.ctrl.setText(path)
+            self.settings.submission_script_template_path.set_value(path)
+            self.settings.submission_script_template_path.ctrl.setText(path)
 
     def accept(self):
         self.settings.update_from_gui()
@@ -122,5 +122,4 @@ class SettingsDlg(QtWidgets.QDialog):
     def reject(self):
         self.settings.unset_controls(self, self.settings.db_table)
         super().reject()
-
 

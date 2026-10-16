@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Copyright 2022 Friedrich Miescher Institute for Biomedical Research
+# Copyright 2022-2026 Friedrich Miescher Institute for Biomedical Research
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@
 from __future__ import absolute_import
 import datetime
 import json
-from selectors import EpollSelector
 from shutil import copyfile
 import time
 from guifold3.src import gui_threads
@@ -154,7 +153,7 @@ def main():
     qss_path = pkg_resources.resource_filename('guifold3.ui', 'gui_style_default.qss')
     with open(qss_path,"r") as qss:
         app.setStyleSheet(qss.read())
-    #app.setStyle('Fusion')
+    app.setStyle('Fusion')
     MainFrame(shared_objects, db, sess, install_path, app)
     app.exec()
 
@@ -628,6 +627,7 @@ class MainFrame(QtWidgets.QMainWindow):
     def prepare_and_start_job(self, jobs_started, split_job_step=None, queue_pid=None):
         #Make sure that not more than one additional job (split_job) can be started without pressing the run button.
         if not jobs_started > 2:
+            job_params = None
             try:
                 # Prepare Job
                 exec_messages = []
@@ -1013,9 +1013,10 @@ class MainFrame(QtWidgets.QMainWindow):
 
             except Exception:
                 logging.debug("Exception in start job")
-                job_params['status'] = 'error'
-                self.OnJobStatus(job_params)
                 traceback.print_exc()
+                if job_params is not None and all(key in job_params for key in ('job_path', 'log_file', 'job_id')):
+                    job_params['status'] = 'error'
+                    self.OnJobStatus(job_params)
         else:
             logger.error("Too many jobs started without pressing run button.")
 
